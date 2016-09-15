@@ -1,7 +1,7 @@
 
 Please don't use this yet!! 
 
-The data in this scraper is partly faked - the start date is set to 1.1.16 and all MPS are current only. This will be updated once I learn to use mechanize to do it properly... 
+The data in this scraper is incomplete - actual election type and past MPs aren't included in the database yet. (sorry). Maybe one day... or you could write it if you want! 
 
 This parser repeats the scrape of the MP list, and then reads out information for lower house MPs only, into the fields expected by OpenAustralia's parser.
 

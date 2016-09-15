@@ -13,6 +13,8 @@ require 'scraperwiki'
 require 'nokogiri'
 require 'open-uri'
 
+require 'time' #this allows parsing the start dates etc
+
 # This version uses fake data for start and end dates, because I am trying to get enough of the code up and running that I can start to see a South Australian version of the site ... 
 
 sa_mps_url = 'https://www2.parliament.sa.gov.au/Internet/DesktopModules/Memberlist.aspx'
@@ -63,10 +65,18 @@ def scrape_person(mp_name, url, which_party)
         electorate_name = cell_content
      end
  
+     # Check if line contains start date
+     if label.to_s == "Date elected" 
+        elected_date_string = cell_content
+        elected_date = Time.parse(elected_date_string).strftime("%d.%m.%Y")
+        puts mp_name + " elected " + elected_date
+     end
+ 
    end #end row interation
 
   #conditional assign: if electorate hasn't been found, set to " "
   electorate_name ||= " "
+  elected_date ||= " "
 
    data = { 
      member_count: url.to_s.split("=").last,
@@ -74,7 +84,7 @@ def scrape_person(mp_name, url, which_party)
      full_name: mp_name,
      division: electorate_name,
      state: 'SA',
-     start_date: '01.01.2016', #yes, this is bogus data
+     start_date: elected_date,
      election_type: ' ',
      end_date: '', 
      reason_left: 'still_in_office',
