@@ -33,7 +33,7 @@ def scrape_list(url)
         scrape_person(a.text, mp_url, party_abbrev)
       end
     else
-       puts "upper house, ignored"
+       puts "\n(+ upper house Senator ignored)"
     end
   end
 end
@@ -44,6 +44,7 @@ def scrape_person(mp_name, url, which_party)
 
    #reset vars for each MP
    electorate_name = nil
+   elected_date = " "
    
    puts "\nName: " + mp_name.to_s
 
@@ -65,18 +66,17 @@ def scrape_person(mp_name, url, which_party)
         electorate_name = cell_content
      end
  
+
      # Check if line contains start date
      if label.to_s == "Date elected" 
         elected_date_string = cell_content
         elected_date = Time.parse(elected_date_string).strftime("%d.%m.%Y")
-        puts mp_name + " elected " + elected_date
      end
- 
+
    end #end row interation
 
   #conditional assign: if electorate hasn't been found, set to " "
   electorate_name ||= " "
-  elected_date ||= " "
 
    data = { 
      member_count: url.to_s.split("=").last,
