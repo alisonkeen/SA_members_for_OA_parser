@@ -13,13 +13,7 @@ require 'scraperwiki'
 require 'nokogiri'
 require 'open-uri'
 
-# This is stopping me from debugging/running
-# what do I need these for? 
-
-# require 'colorize'
-# require 'pry'
-# require 'open-uri/cached'
-# OpenURI::Cache.cache_path = '.cache'
+# This version uses fake data for start and end dates, because I am trying to get enough of the code up and running that I can start to see a South Australian version of the site ... 
 
 sa_mps_url = 'https://www2.parliament.sa.gov.au/Internet/DesktopModules/Memberlist.aspx'
 
@@ -29,26 +23,27 @@ end
 
 def scrape_list(url)
   noko = noko_for(url)
-  noko.css('table table table tr').css('a[href*="MemberDrill"]').each do |a|
-    mp_url = URI.join url, a.attr('href')
-    scrape_person(a.text, mp_url)
+  noko.css('table table table tr').each do |line|
+    party_abbrev = line.css('td')[1].text.to_s
+    if (line.css('td')[2].text.to_s == "HA")
+      line.css('a[href*="MemberDrill"]').each do |a|
+        mp_url = URI.join url, a.attr('href')
+        scrape_person(a.text, mp_url, party_abbrev)
+      end
+    else
+       puts "upper house, ignored"
+    end
   end
 end
 
-def scrape_person(mp_name, url)
+def scrape_person(mp_name, url, which_party)
 
    noko = noko_for(url)
 
    #reset vars for each MP
-   electorate_name = nil, which_party = nil, which_house = nil
-   email_address = nil
+   electorate_name = nil
    
    puts "\nName: " + mp_name.to_s
-
-   #Image is located in a different place to other info
-   image_tag = noko.css('img[src*="PersonImage"]')[0]
-   image_src = URI.join url, image_tag.attr('src')
-   puts "Image: " + image_src.to_s
 
    # Iterate over the rows of general info and try and
    # identify specific information
@@ -66,42 +61,32 @@ def scrape_person(mp_name, url)
      # Check if line contains Electorate
      if label.to_s == "Electorate" 
         electorate_name = cell_content
-	puts "Electorate: " + electorate_name
-     end
- 
-     # Check if it's which house
-     if label.to_s == "House" 
-        which_house = cell_content
-	puts "House: " + which_house
-     end
-
-     # Check if line contains MP email
-     if label.to_s == "Email" 
-        email_address = cell_content
-	puts "Email: " + email_address
-     end
- 
-     # Check if line contains MP email
-     if label.to_s == "Political Party" 
-        which_party = cell_content
-	puts "Party: " + which_party
      end
  
    end #end row interation
 
+  #conditional assign: if electorate hasn't been found, set to " "
+  electorate_name ||= " "
+
    data = { 
-     id: url.to_s.split("=").last,
+     member_count: url.to_s.split("=").last,
      id__saparl: url.to_s.split("=").last,
      full_name: mp_name,
-     house: which_house,
-     email: email_address,
-     image: image_src,
-     profile_page: url.to_s,
+     division: electorate_name,
+     state: 'SA',
+     start_date: '01.01.2016', #yes, this is bogus data
+     election_type: ' ',
+     end_date: '', 
+     reason_left: 'still_in_office',
+     party: which_party,
    }
+
+   puts data.to_s
 
    data[:image] = URI.join(url, data[:image]).to_s unless data[:image].to_s.empty?
 
-   ScraperWiki.save_sqlite([:id], data)
+  ScraperWiki.save_sqlite([:member_count], data)
+
 end
 
 scrape_list(sa_mps_url)
