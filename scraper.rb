@@ -89,12 +89,9 @@ def scrape_person(mp_name, url, which_party)
      end_date: '', 
      reason_left: 'still_in_office',
      party: which_party,
-     group: which_party,
    }
 
    puts data.to_s
-
-   data[:image] = URI.join(url, data[:image]).to_s unless data[:image].to_s.empty?
 
   ScraperWiki.save_sqlite([:member_count], data)
 
