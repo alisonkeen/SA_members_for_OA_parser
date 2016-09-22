@@ -1,6 +1,4 @@
 
-Please don't use this yet!! 
-
 The data in this scraper is incomplete - actual election type and past MPs aren't included in the database yet. (sorry). Maybe one day... or you could write it if you want! 
 
 This parser repeats the scrape of the MP list, and then reads out information for lower house MPs only, into the fields expected by OpenAustralia's parser.
@@ -15,8 +13,11 @@ scraper #2: List of MHRs - https://morph.io/alisonkeen/SA\_members\_for\_OA\_par
 fields {id, id2, Name, Electorate, State/Territory(?), Start date, Election type, End date, reason, Most recent party}
 destination: /var/www/openaustralia/openaustralia-parser/data/representatives.csv
 
-scraper #3: List of Senators - (coming soon)
+scraper #3: List of Senators - https://morph.io/alisonkeen/SA\_senators\_for\_OA\_parser
 fields {id, id2, Name, Electorate, State/Territory(?), Start date, Election type, End date, reason, Most recent party}
+destination: /var/www/openaustralia/openaustralia-parser/data/senators.csv
+
+Ruby script to read these three .csv files into OpenAustralia: see https://github.com/alisonkeen/openaustralia-parser-sandbox/import-data-from-morph.rb
 
 
 This is a scraper that runs on [Morph](https://morph.io). To get started [see the documentation](https://morph.io/documentation)
